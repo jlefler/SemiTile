@@ -1,0 +1,19 @@
+[Desktop Entry]
+Comment=Adds a menu to that allows the user to move and resize a window in a tile-like way.
+Encoding=UTF-8
+Icon=preferences-system-windows
+Keywords=tile tiling window
+Name=SemiTile
+Type=Service
+X-KDE-ParentApp=
+X-KDE-PluginInfo-Author=Josh Lefler
+X-KDE-PluginInfo-Email=jlefler@gmail.com
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-Name=semitile
+X-KDE-PluginInfo-Version=1
+X-KDE-PluginInfo-Website=
+X-KDE-ServiceTypes=KWin/Script
+X-Plasma-API=javascript
+X-Plasma-DefaultSize=200,100
+X-Plasma-MainScript=code/semitile.js
+X-Plasma-RemoteLocation=
