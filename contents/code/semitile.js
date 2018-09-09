@@ -1,28 +1,29 @@
 /*
- * TODO: License
+ * Copyright 2018 Josh Lefler. <jlefler@gmail.com>
  *
+ * This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
 */
-var curGrid = "1x3";
-var gridRows = 1;
-var gridColumns = 3;
-
-function setGridSize(rows, columns) {
-    curGrid = rows + "x" + columns;
-    gridRows = rows;
-    gridColumns = columns;
-    print("curGrid set to " + curGrid);
-}
-
-function moveTo(client, row, column) {
+function moveTo(client, column, row, columnMode, rowMode) {
     //size window
     var geo = client.geometry;
-    var width = workspace.workspaceWidth / gridColumns;
-    var height = workspace.workspaceHeight / gridRows;
+    var width = workspace.workspaceWidth / columnMode;
+    var height = workspace.workspaceHeight / rowMode;
     
     //move window
-    var left = column * (workspace.workspaceWidth / gridColumns);
-    var top = row * (workspace.workspaceHeight / gridRows);
+    var left = column * (workspace.workspaceWidth / columnMode);
+    var top = row * (workspace.workspaceHeight / rowMode);
     geo.width = width;
     geo.height = height;
     geo.x = left;
@@ -36,73 +37,44 @@ function moveTo(client, row, column) {
 /*global registerUserActionsMenu*/
 registerUserActionsMenu(function (client) {
 	"use strict";
-    
-    var gridMenu = {
-			text: "Choose Grid",
-			items: [{
-					text: "1x3",
-					checkable: true,
-					checked: curGrid === "1x3",
-					triggered: function() {
-						setGridSize(1, 3);
-					}
-			},
-			{
-				text: "2x3",
-				checkable: true,
-				checked: curGrid === "2x3",
-				triggered: function() {
-                    setGridSize(2, 3);
-				}
-			},
-			{
-				text: "1x4",
-				checkable: true,
-				checked: curGrid === "1x4",
-				triggered: function() {
-					setGridSize(1, 4);
-				}
-			},
-			{
-                text: "2x4",
-                checkable: true,
-                checked: curGrid === "2x4",
-                triggered: function() {
-                    setGridSize(2, 4);
-                }
-			}]
-		};
         
-        var moveItems = [];
-        print("Step 3 - " + curGrid);
-        for (row = 0; row < gridRows; row++) {
-            for (column = 0; column < gridColumns; column++) {
-                print("Row: " + row + ", Column: " + column);
-                var newItem = {
-                    text: "Move to " + (row + 1) + "x" + (column + 1),
-                    checkable: false,
-                    checked: false,
-                    triggered: (function() {
-                        var localRow = row;
-                        var localColumn = column;
-                        var localClient = client;
-                        return function() {
-                            moveTo(localClient, localRow, localColumn);
-                        }
-                    })()
+        var modeMenus = [];
+        
+        for (columnMode = 2; columnMode < 5; columnMode++) {
+            for (rowMode = 1; rowMode < 4; rowMode++) {
+                var moveItems = [];
+                for (column = 0; column < columnMode; column++) {
+                    for (row = 0; row < rowMode; row++) {
+                        var newItem = {
+                            text: "Column " + (column + 1) + ", Row " + (row + 1),
+                            checkable: false,
+                            checked: false,
+                            triggered: (function() {
+                                var localColumn = column;
+                                var localRow = row;
+                                var localClient = client;
+                                var localColumnMode = columnMode;
+                                var localRowMode = rowMode;
+                                return function() {
+                                    moveTo(localClient, localColumn, localRow, localColumnMode, localRowMode);
+                                }
+                            })()
+                        };
+                        moveItems.push(newItem);
+                    }
+                }
+                var modeMenu = {
+                    text: columnMode + " Columns, " + rowMode + " Rows",
+                    items: moveItems
                 };
-                moveItems.push(newItem);
+                modeMenus.push(modeMenu);
             }
         }
         
-        var windowMenu = {
-            text: "Move Window",
-            items: moveItems
-        };
         
         var allMenu = {
             text: "SemiTile",
-            items: [gridMenu, windowMenu]
+            items: modeMenus
         };
         
         return allMenu;
